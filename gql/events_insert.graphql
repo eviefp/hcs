@@ -1,0 +1,9 @@
+mutation InsertEventQuery($objects: [events_insert_input!]!, $key: String) {
+  delete_events(where: {key: {_eq: $key}}) {
+    affected_rows
+  }
+
+  insert_events(objects: $objects) {
+    affected_rows
+  }
+}

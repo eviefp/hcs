@@ -6,3 +6,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = { version = "0.4", features = [ "alloc", "std", "clock", "serde", "unstable-locales" ] }
+chrono-tz = "0.4"
+clap = { version = "3.0.14", features = ["derive"] }
+futures = "0.3.21"
+graphql_client = "0.10.0"
+ical = { version = "0.7.0", features = [ "ical" ] }
+iso8061-timestamp = { version = "0.1.3" }
+owo-colors = { version = "3.2.0", features = [ "supports-colors" ] }
+reqwest = { version = "0.11.9", features = [ "json" ] }
+serde = "1.0.136"
+serde_derive = "1.0.136"
+tokio = { version = "1.16.1", features = [ "full" ] }
+toml = "0.5.8"

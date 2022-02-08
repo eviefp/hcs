@@ -1,0 +1,16 @@
+query TodayEventQuery($start: timestamptz, $end: timestamptz) {
+  events(order_by: {start: asc}, where: {start: {_lt: $end, _gt: $start}}) {
+    attach
+    calendar_uid
+    created_at
+    description
+    end
+    id
+    location
+    organizer
+    start
+    status
+    summary
+    updated_at
+  }
+}

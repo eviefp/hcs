@@ -1,7 +1,7 @@
 let
   sources = import ./nix/sources.nix;
   rustOverlay = import sources.rust-overlay;
-  pkgs = import <nixpkgs> {
+  pkgs = import sources.nixpkgs {
     overlays = [ rustOverlay ];
   };
 in
@@ -13,6 +13,8 @@ pkgs.mkShell {
     pkgs.rustc
     pkgs.cargo
     pkgs.rustfmt
+    pkgs.openssl
+    pkgs.pkgconfig
   ];
 
   RUST_BACKTRACE = 1;

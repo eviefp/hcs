@@ -1,0 +1,937 @@
+schema {
+  query: query_root
+  mutation: mutation_root
+  subscription: subscription_root
+}
+
+"""whether this query should be cached (Hasura Cloud only)"""
+directive @cached(
+  """measured in seconds"""
+  ttl: Int! = 60
+
+  """refresh the cache entry"""
+  refresh: Boolean! = false
+) on QUERY
+
+"""
+Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'.
+"""
+input Int_comparison_exp {
+  _eq: Int
+  _gt: Int
+  _gte: Int
+  _in: [Int!]
+  _is_null: Boolean
+  _lt: Int
+  _lte: Int
+  _neq: Int
+  _nin: [Int!]
+}
+
+"""
+Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'.
+"""
+input String_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+
+  """does the column match the given case-insensitive pattern"""
+  _ilike: String
+  _in: [String!]
+
+  """
+  does the column match the given POSIX regular expression, case insensitive
+  """
+  _iregex: String
+  _is_null: Boolean
+
+  """does the column match the given pattern"""
+  _like: String
+  _lt: String
+  _lte: String
+  _neq: String
+
+  """does the column NOT match the given case-insensitive pattern"""
+  _nilike: String
+  _nin: [String!]
+
+  """
+  does the column NOT match the given POSIX regular expression, case insensitive
+  """
+  _niregex: String
+
+  """does the column NOT match the given pattern"""
+  _nlike: String
+
+  """
+  does the column NOT match the given POSIX regular expression, case sensitive
+  """
+  _nregex: String
+
+  """does the column NOT match the given SQL regular expression"""
+  _nsimilar: String
+
+  """
+  does the column match the given POSIX regular expression, case sensitive
+  """
+  _regex: String
+
+  """does the column match the given SQL regular expression"""
+  _similar: String
+}
+
+"""
+columns and relationships of "events"
+"""
+type events {
+  attach: String
+  calendar_uid: String!
+  created_at: timestamptz!
+  description: String
+  end: timestamptz
+  id: Int!
+  key: String!
+  location: String
+  organizer: String
+  start: timestamptz
+  status: String
+  summary: String
+  updated_at: timestamptz!
+}
+
+"""
+aggregated selection of "events"
+"""
+type events_aggregate {
+  aggregate: events_aggregate_fields
+  nodes: [events!]!
+}
+
+"""
+aggregate fields of "events"
+"""
+type events_aggregate_fields {
+  avg: events_avg_fields
+  count(columns: [events_select_column!], distinct: Boolean): Int!
+  max: events_max_fields
+  min: events_min_fields
+  stddev: events_stddev_fields
+  stddev_pop: events_stddev_pop_fields
+  stddev_samp: events_stddev_samp_fields
+  sum: events_sum_fields
+  var_pop: events_var_pop_fields
+  var_samp: events_var_samp_fields
+  variance: events_variance_fields
+}
+
+"""aggregate avg on columns"""
+type events_avg_fields {
+  id: Float
+}
+
+"""
+Boolean expression to filter rows from the table "events". All fields are combined with a logical 'AND'.
+"""
+input events_bool_exp {
+  _and: [events_bool_exp!]
+  _not: events_bool_exp
+  _or: [events_bool_exp!]
+  attach: String_comparison_exp
+  calendar_uid: String_comparison_exp
+  created_at: timestamptz_comparison_exp
+  description: String_comparison_exp
+  end: timestamptz_comparison_exp
+  id: Int_comparison_exp
+  key: String_comparison_exp
+  location: String_comparison_exp
+  organizer: String_comparison_exp
+  start: timestamptz_comparison_exp
+  status: String_comparison_exp
+  summary: String_comparison_exp
+  updated_at: timestamptz_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "events"
+"""
+enum events_constraint {
+  """unique or primary key constraint"""
+  events_pkey
+}
+
+"""
+input type for incrementing numeric columns in table "events"
+"""
+input events_inc_input {
+  id: Int
+}
+
+"""
+input type for inserting data into table "events"
+"""
+input events_insert_input {
+  attach: String
+  calendar_uid: String
+  created_at: timestamptz
+  description: String
+  end: timestamptz
+  key: String
+  location: String
+  organizer: String
+  start: timestamptz
+  status: String
+  summary: String
+  updated_at: timestamptz
+}
+
+"""aggregate max on columns"""
+type events_max_fields {
+  attach: String
+  calendar_uid: String
+  created_at: timestamptz
+  description: String
+  end: timestamptz
+  id: Int
+  key: String
+  location: String
+  organizer: String
+  start: timestamptz
+  status: String
+  summary: String
+  updated_at: timestamptz
+}
+
+"""aggregate min on columns"""
+type events_min_fields {
+  attach: String
+  calendar_uid: String
+  created_at: timestamptz
+  description: String
+  end: timestamptz
+  id: Int
+  key: String
+  location: String
+  organizer: String
+  start: timestamptz
+  status: String
+  summary: String
+  updated_at: timestamptz
+}
+
+"""
+response of any mutation on the table "events"
+"""
+type events_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [events!]!
+}
+
+"""
+on conflict condition type for table "events"
+"""
+input events_on_conflict {
+  constraint: events_constraint!
+  update_columns: [events_update_column!]! = []
+  where: events_bool_exp
+}
+
+"""Ordering options when selecting data from "events"."""
+input events_order_by {
+  attach: order_by
+  calendar_uid: order_by
+  created_at: order_by
+  description: order_by
+  end: order_by
+  id: order_by
+  key: order_by
+  location: order_by
+  organizer: order_by
+  start: order_by
+  status: order_by
+  summary: order_by
+  updated_at: order_by
+}
+
+"""primary key columns input for table: events"""
+input events_pk_columns_input {
+  id: Int!
+}
+
+"""
+select columns of table "events"
+"""
+enum events_select_column {
+  """column name"""
+  attach
+
+  """column name"""
+  calendar_uid
+
+  """column name"""
+  created_at
+
+  """column name"""
+  description
+
+  """column name"""
+  end
+
+  """column name"""
+  id
+
+  """column name"""
+  key
+
+  """column name"""
+  location
+
+  """column name"""
+  organizer
+
+  """column name"""
+  start
+
+  """column name"""
+  status
+
+  """column name"""
+  summary
+
+  """column name"""
+  updated_at
+}
+
+"""
+input type for updating data in table "events"
+"""
+input events_set_input {
+  attach: String
+  calendar_uid: String
+  created_at: timestamptz
+  description: String
+  end: timestamptz
+  id: Int
+  key: String
+  location: String
+  organizer: String
+  start: timestamptz
+  status: String
+  summary: String
+  updated_at: timestamptz
+}
+
+"""aggregate stddev on columns"""
+type events_stddev_fields {
+  id: Float
+}
+
+"""aggregate stddev_pop on columns"""
+type events_stddev_pop_fields {
+  id: Float
+}
+
+"""aggregate stddev_samp on columns"""
+type events_stddev_samp_fields {
+  id: Float
+}
+
+"""aggregate sum on columns"""
+type events_sum_fields {
+  id: Int
+}
+
+"""
+update columns of table "events"
+"""
+enum events_update_column {
+  """column name"""
+  attach
+
+  """column name"""
+  calendar_uid
+
+  """column name"""
+  created_at
+
+  """column name"""
+  description
+
+  """column name"""
+  end
+
+  """column name"""
+  id
+
+  """column name"""
+  key
+
+  """column name"""
+  location
+
+  """column name"""
+  organizer
+
+  """column name"""
+  start
+
+  """column name"""
+  status
+
+  """column name"""
+  summary
+
+  """column name"""
+  updated_at
+}
+
+"""aggregate var_pop on columns"""
+type events_var_pop_fields {
+  id: Float
+}
+
+"""aggregate var_samp on columns"""
+type events_var_samp_fields {
+  id: Float
+}
+
+"""aggregate variance on columns"""
+type events_variance_fields {
+  id: Float
+}
+
+"""mutation root"""
+type mutation_root {
+  """
+  delete data from the table: "events"
+  """
+  delete_events(
+    """filter the rows which have to be deleted"""
+    where: events_bool_exp!
+  ): events_mutation_response
+
+  """
+  delete single row from the table: "events"
+  """
+  delete_events_by_pk(id: Int!): events
+
+  """
+  delete data from the table: "testing"
+  """
+  delete_testing(
+    """filter the rows which have to be deleted"""
+    where: testing_bool_exp!
+  ): testing_mutation_response
+
+  """
+  delete single row from the table: "testing"
+  """
+  delete_testing_by_pk(id: Int!): testing
+
+  """
+  insert data into the table: "events"
+  """
+  insert_events(
+    """the rows to be inserted"""
+    objects: [events_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: events_on_conflict
+  ): events_mutation_response
+
+  """
+  insert a single row into the table: "events"
+  """
+  insert_events_one(
+    """the row to be inserted"""
+    object: events_insert_input!
+
+    """on conflict condition"""
+    on_conflict: events_on_conflict
+  ): events
+
+  """
+  insert data into the table: "testing"
+  """
+  insert_testing(
+    """the rows to be inserted"""
+    objects: [testing_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: testing_on_conflict
+  ): testing_mutation_response
+
+  """
+  insert a single row into the table: "testing"
+  """
+  insert_testing_one(
+    """the row to be inserted"""
+    object: testing_insert_input!
+
+    """on conflict condition"""
+    on_conflict: testing_on_conflict
+  ): testing
+
+  """
+  update data of the table: "events"
+  """
+  update_events(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: events_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: events_set_input
+
+    """filter the rows which have to be updated"""
+    where: events_bool_exp!
+  ): events_mutation_response
+
+  """
+  update single row of the table: "events"
+  """
+  update_events_by_pk(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: events_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: events_set_input
+    pk_columns: events_pk_columns_input!
+  ): events
+
+  """
+  update data of the table: "testing"
+  """
+  update_testing(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: testing_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: testing_set_input
+
+    """filter the rows which have to be updated"""
+    where: testing_bool_exp!
+  ): testing_mutation_response
+
+  """
+  update single row of the table: "testing"
+  """
+  update_testing_by_pk(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: testing_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: testing_set_input
+    pk_columns: testing_pk_columns_input!
+  ): testing
+}
+
+"""column ordering options"""
+enum order_by {
+  """in ascending order, nulls last"""
+  asc
+
+  """in ascending order, nulls first"""
+  asc_nulls_first
+
+  """in ascending order, nulls last"""
+  asc_nulls_last
+
+  """in descending order, nulls first"""
+  desc
+
+  """in descending order, nulls first"""
+  desc_nulls_first
+
+  """in descending order, nulls last"""
+  desc_nulls_last
+}
+
+type query_root {
+  """
+  fetch data from the table: "events"
+  """
+  events(
+    """distinct select on columns"""
+    distinct_on: [events_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [events_order_by!]
+
+    """filter the rows returned"""
+    where: events_bool_exp
+  ): [events!]!
+
+  """
+  fetch aggregated fields from the table: "events"
+  """
+  events_aggregate(
+    """distinct select on columns"""
+    distinct_on: [events_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [events_order_by!]
+
+    """filter the rows returned"""
+    where: events_bool_exp
+  ): events_aggregate!
+
+  """fetch data from the table: "events" using primary key columns"""
+  events_by_pk(id: Int!): events
+
+  """
+  fetch data from the table: "testing"
+  """
+  testing(
+    """distinct select on columns"""
+    distinct_on: [testing_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [testing_order_by!]
+
+    """filter the rows returned"""
+    where: testing_bool_exp
+  ): [testing!]!
+
+  """
+  fetch aggregated fields from the table: "testing"
+  """
+  testing_aggregate(
+    """distinct select on columns"""
+    distinct_on: [testing_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [testing_order_by!]
+
+    """filter the rows returned"""
+    where: testing_bool_exp
+  ): testing_aggregate!
+
+  """fetch data from the table: "testing" using primary key columns"""
+  testing_by_pk(id: Int!): testing
+}
+
+type subscription_root {
+  """
+  fetch data from the table: "events"
+  """
+  events(
+    """distinct select on columns"""
+    distinct_on: [events_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [events_order_by!]
+
+    """filter the rows returned"""
+    where: events_bool_exp
+  ): [events!]!
+
+  """
+  fetch aggregated fields from the table: "events"
+  """
+  events_aggregate(
+    """distinct select on columns"""
+    distinct_on: [events_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [events_order_by!]
+
+    """filter the rows returned"""
+    where: events_bool_exp
+  ): events_aggregate!
+
+  """fetch data from the table: "events" using primary key columns"""
+  events_by_pk(id: Int!): events
+
+  """
+  fetch data from the table: "testing"
+  """
+  testing(
+    """distinct select on columns"""
+    distinct_on: [testing_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [testing_order_by!]
+
+    """filter the rows returned"""
+    where: testing_bool_exp
+  ): [testing!]!
+
+  """
+  fetch aggregated fields from the table: "testing"
+  """
+  testing_aggregate(
+    """distinct select on columns"""
+    distinct_on: [testing_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [testing_order_by!]
+
+    """filter the rows returned"""
+    where: testing_bool_exp
+  ): testing_aggregate!
+
+  """fetch data from the table: "testing" using primary key columns"""
+  testing_by_pk(id: Int!): testing
+}
+
+"""
+columns and relationships of "testing"
+"""
+type testing {
+  created_at: timestamptz!
+  id: Int!
+  name: String!
+}
+
+"""
+aggregated selection of "testing"
+"""
+type testing_aggregate {
+  aggregate: testing_aggregate_fields
+  nodes: [testing!]!
+}
+
+"""
+aggregate fields of "testing"
+"""
+type testing_aggregate_fields {
+  avg: testing_avg_fields
+  count(columns: [testing_select_column!], distinct: Boolean): Int!
+  max: testing_max_fields
+  min: testing_min_fields
+  stddev: testing_stddev_fields
+  stddev_pop: testing_stddev_pop_fields
+  stddev_samp: testing_stddev_samp_fields
+  sum: testing_sum_fields
+  var_pop: testing_var_pop_fields
+  var_samp: testing_var_samp_fields
+  variance: testing_variance_fields
+}
+
+"""aggregate avg on columns"""
+type testing_avg_fields {
+  id: Float
+}
+
+"""
+Boolean expression to filter rows from the table "testing". All fields are combined with a logical 'AND'.
+"""
+input testing_bool_exp {
+  _and: [testing_bool_exp!]
+  _not: testing_bool_exp
+  _or: [testing_bool_exp!]
+  created_at: timestamptz_comparison_exp
+  id: Int_comparison_exp
+  name: String_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "testing"
+"""
+enum testing_constraint {
+  """unique or primary key constraint"""
+  testing_pkey
+}
+
+"""
+input type for incrementing numeric columns in table "testing"
+"""
+input testing_inc_input {
+  id: Int
+}
+
+"""
+input type for inserting data into table "testing"
+"""
+input testing_insert_input {
+  created_at: timestamptz
+  id: Int
+  name: String
+}
+
+"""aggregate max on columns"""
+type testing_max_fields {
+  created_at: timestamptz
+  id: Int
+  name: String
+}
+
+"""aggregate min on columns"""
+type testing_min_fields {
+  created_at: timestamptz
+  id: Int
+  name: String
+}
+
+"""
+response of any mutation on the table "testing"
+"""
+type testing_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [testing!]!
+}
+
+"""
+on conflict condition type for table "testing"
+"""
+input testing_on_conflict {
+  constraint: testing_constraint!
+  update_columns: [testing_update_column!]! = []
+  where: testing_bool_exp
+}
+
+"""Ordering options when selecting data from "testing"."""
+input testing_order_by {
+  created_at: order_by
+  id: order_by
+  name: order_by
+}
+
+"""primary key columns input for table: testing"""
+input testing_pk_columns_input {
+  id: Int!
+}
+
+"""
+select columns of table "testing"
+"""
+enum testing_select_column {
+  """column name"""
+  created_at
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+}
+
+"""
+input type for updating data in table "testing"
+"""
+input testing_set_input {
+  created_at: timestamptz
+  id: Int
+  name: String
+}
+
+"""aggregate stddev on columns"""
+type testing_stddev_fields {
+  id: Float
+}
+
+"""aggregate stddev_pop on columns"""
+type testing_stddev_pop_fields {
+  id: Float
+}
+
+"""aggregate stddev_samp on columns"""
+type testing_stddev_samp_fields {
+  id: Float
+}
+
+"""aggregate sum on columns"""
+type testing_sum_fields {
+  id: Int
+}
+
+"""
+update columns of table "testing"
+"""
+enum testing_update_column {
+  """column name"""
+  created_at
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+}
+
+"""aggregate var_pop on columns"""
+type testing_var_pop_fields {
+  id: Float
+}
+
+"""aggregate var_samp on columns"""
+type testing_var_samp_fields {
+  id: Float
+}
+
+"""aggregate variance on columns"""
+type testing_variance_fields {
+  id: Float
+}
+
+scalar timestamptz
+
+"""
+Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'.
+"""
+input timestamptz_comparison_exp {
+  _eq: timestamptz
+  _gt: timestamptz
+  _gte: timestamptz
+  _in: [timestamptz!]
+  _is_null: Boolean
+  _lt: timestamptz
+  _lte: timestamptz
+  _neq: timestamptz
+  _nin: [timestamptz!]
+}
+

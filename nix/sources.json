@@ -12,15 +12,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "release-20.03",
+        "branch": "nixpkgs-unstable",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "eb73405ecceb1dc505b7cbbd234f8f94165e2696",
-        "sha256": "06k21wbyhhvq2f1xczszh3c2934p0m02by3l2ixvd6nkwrqklax7",
+        "rev": "942b0817e898262cc6e3f0a5f706ce09d8f749f1",
+        "sha256": "048r0rjwlymixbwqfqygn96jm2czdf7a74qgxl6z2al5h02wd5af",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/eb73405ecceb1dc505b7cbbd234f8f94165e2696.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/942b0817e898262cc6e3f0a5f706ce09d8f749f1.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "rust-overlay": {
