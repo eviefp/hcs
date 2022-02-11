@@ -10,7 +10,7 @@ use chrono::TimeZone;
 use chrono_tz::Europe::Bucharest;
 use clap::Parser;
 use next::perform_next_event_query;
-use owo_colors::OwoColorize;
+use owo_colors::{OwoColorize, Stream::Stdout};
 use std::error::Error;
 use today::perform_today_event_query;
 
@@ -27,8 +27,14 @@ async fn import(config: common::Config, target: String) -> Result<(), Box<dyn Er
 
     let (del, ins) = insert::perform_insert_event(config.hasura, import.name, events).await?;
 
-    println!("Removed {} events!", del.red());
-    println!("Inserted {} events!", ins.green());
+    println!(
+        "Removed {} events!",
+        del.if_supports_color(Stdout, |t| t.red())
+    );
+    println!(
+        "Inserted {} events!",
+        ins.if_supports_color(Stdout, |t| t.green())
+    );
 
     Ok(())
 }
@@ -58,7 +64,13 @@ fn print_event(e: today::today_event_query::TodayEventQueryEvents) -> Result<(),
         .ok_or(HcsError::MissingStart {})?
         .with_timezone(&local_tz);
     let start_fmt = start.format("%H:%M").to_string();
-    println!("{} {}", start_fmt.green(), e.summary.unwrap().magenta());
+    println!(
+        "{} {}",
+        start_fmt.if_supports_color(Stdout, |t| t.green()),
+        e.summary
+            .unwrap()
+            .if_supports_color(Stdout, |t| t.magenta())
+    );
     Ok(())
 }
 
@@ -77,7 +89,13 @@ fn print_next_event(e: next::next_event_query::NextEventQueryEvents) -> Result<(
         .ok_or(HcsError::MissingStart {})?
         .with_timezone(&local_tz);
     let start_fmt = start.format("%H:%M").to_string();
-    println!("{} {}", start_fmt.green(), e.summary.unwrap().magenta());
+    println!(
+        "{} {}",
+        start_fmt.if_supports_color(Stdout, |t| t.green()),
+        e.summary
+            .unwrap()
+            .if_supports_color(Stdout, |t| t.magenta())
+    );
     Ok(())
 }
 
@@ -101,7 +119,7 @@ fn load_config() -> Result<common::Config, Box<dyn Error>> {
     let hcs = xdg::BaseDirectories::with_prefix("hcs")?;
     let config_path = hcs.place_config_file("hcs.toml").expect("");
     let config_content = std::fs::read_to_string(config_path)?;
-    let config : common::Config = toml::from_str(&config_content)?;
+    let config: common::Config = toml::from_str(&config_content)?;
     Ok(config)
 }
 
