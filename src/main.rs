@@ -97,10 +97,17 @@ async fn next(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn load_config() -> Result<common::Config, Box<dyn Error>> {
+    let hcs = xdg::BaseDirectories::with_prefix("hcs")?;
+    let config_path = hcs.place_config_file("hcs.toml").expect("");
+    let config_content = std::fs::read_to_string(config_path)?;
+    let config : common::Config = toml::from_str(&config_content)?;
+    Ok(config)
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let config_content = std::fs::read_to_string("hcs.toml")?;
-    let config: common::Config = toml::from_str(&config_content)?;
+    let config: common::Config = load_config()?;
     match Args::parse().command {
         Commands::Import { target } => import(config, target).await?,
         Commands::Today {} => today(config.hasura).await?,
