@@ -74,7 +74,10 @@ fn print_event(e: today::today_event_query::TodayEventQueryEvents) -> Result<(),
     Ok(())
 }
 
-fn print_next_event(e: next::next_event_query::NextEventQueryEvents) -> Result<(), Box<dyn Error>> {
+fn print_next_event(
+    e: next::next_event_query::NextEventQueryEvents,
+    xmobar: bool,
+) -> Result<(), Box<dyn Error>> {
     // TODO: figure out why local_offset doesn't work
     let local_tz = Some(Bucharest).ok_or(HcsError::MissingStart {})?;
     let start = chrono_tz::UTC
@@ -89,13 +92,23 @@ fn print_next_event(e: next::next_event_query::NextEventQueryEvents) -> Result<(
         .ok_or(HcsError::MissingStart {})?
         .with_timezone(&local_tz);
     let start_fmt = start.format("%H:%M").to_string();
-    println!(
-        "{} {}",
-        start_fmt.if_supports_color(Stdout, |t| t.green()),
-        e.summary
-            .unwrap()
-            .if_supports_color(Stdout, |t| t.magenta())
-    );
+    if xmobar {
+        let mut out = e.summary.unwrap();
+        let len = out.len();
+        out.truncate(16);
+        if len > out.len() {
+            out = out + "...";
+        }
+        println!( "<fc=#00ed8a>{}</fc> <fc=#00d9ed>{}</fc>", start_fmt, out);
+    } else {
+        println!(
+            "{} {}",
+            start_fmt.if_supports_color(Stdout, |t| t.green()),
+            e.summary
+                .unwrap()
+                .if_supports_color(Stdout, |t| t.magenta())
+        );
+    }
     Ok(())
 }
 
@@ -109,9 +122,9 @@ async fn today(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn next(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
+async fn next(hasura: common::Hasura, xmobar: bool) -> Result<(), Box<dyn Error>> {
     let result = perform_next_event_query(hasura).await?;
-    print_next_event(result)?;
+    print_next_event(result, xmobar)?;
     Ok(())
 }
 
@@ -129,7 +142,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     match Args::parse().command {
         Commands::Import { target } => import(config, target).await?,
         Commands::Today {} => today(config.hasura).await?,
-        Commands::Next {} => next(config.hasura).await?,
+        Commands::Next { xmobar } => next(config.hasura, xmobar).await?,
     };
 
     Ok(())

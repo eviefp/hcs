@@ -12,5 +12,8 @@ pub struct Args {
 pub enum Commands {
     Import { target: String },
     Today {},
-    Next {},
+    Next {
+        #[clap(long)]
+        xmobar: bool,
+    },
 }
