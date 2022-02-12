@@ -11,6 +11,7 @@ use std::fmt;
 pub enum HcsError {
     InsertDataError {},
     TodayError {},
+    NextError {},
     CalError {},
     ImportMissingKey {},
     MissingStart {},

@@ -3,8 +3,8 @@ use iso8061_timestamp::Timestamp;
 use reqwest;
 use std::error::Error;
 
-use crate::common::HcsError;
 use crate::common::timestamptz;
+use crate::common::HcsError;
 
 // Next event
 #[derive(GraphQLQuery)]
@@ -17,11 +17,11 @@ pub struct NextEventQuery;
 
 pub async fn perform_next_event_query(
     hasura: crate::common::Hasura,
-) -> Result<next_event_query::NextEventQueryEvents, Box<dyn Error>> {
+) -> Result<Option<next_event_query::NextEventQueryEvents>, Box<dyn Error>> {
     let today = chrono::Local::now();
     let tomorrow = today
         .checked_add_signed(chrono::Duration::days(1))
-        .ok_or(HcsError::TodayError {})?;
+        .ok_or(HcsError::NextError {})?;
     let start: Timestamp = Timestamp::from_unix_timestamp(today.timestamp());
     let end: Timestamp = Timestamp::from_unix_timestamp(tomorrow.timestamp());
     let no_vars = next_event_query::Variables {
@@ -40,6 +40,6 @@ pub async fn perform_next_event_query(
         res.json().await?;
     response_body
         .data
-        .ok_or(HcsError::TodayError {}.into())
-        .and_then(|x| x.events.into_iter().next().ok_or(HcsError::TodayError {}.into()))
+        .ok_or(HcsError::NextError {}.into())
+        .map(|x| x.events.into_iter().next())
 }

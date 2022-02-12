@@ -75,39 +75,50 @@ fn print_event(e: today::today_event_query::TodayEventQueryEvents) -> Result<(),
 }
 
 fn print_next_event(
-    e: next::next_event_query::NextEventQueryEvents,
+    o: Option<next::next_event_query::NextEventQueryEvents>,
     xmobar: bool,
 ) -> Result<(), Box<dyn Error>> {
     // TODO: figure out why local_offset doesn't work
-    let local_tz = Some(Bucharest).ok_or(HcsError::MissingStart {})?;
-    let start = chrono_tz::UTC
-        .timestamp_opt(
-            e.start
-                .ok_or(HcsError::MissingStart {})?
-                .to_unix_timestamp_ms()
-                / 1000,
-            0,
-        )
-        .single()
-        .ok_or(HcsError::MissingStart {})?
-        .with_timezone(&local_tz);
-    let start_fmt = start.format("%H:%M").to_string();
-    if xmobar {
-        let mut out = e.summary.unwrap();
-        let len = out.len();
-        out.truncate(16);
-        if len > out.len() {
-            out = out + "...";
+    match o {
+        None => {
+            if xmobar {
+                println!("<fc=#00ed8a>N/A</fc>");
+            } else {
+                println!("{}", "No events today.".if_supports_color(Stdout, |t| t.green()));
+            }
         }
-        println!( "<fc=#00ed8a>{}</fc> <fc=#00d9ed>{}</fc>", start_fmt, out);
-    } else {
-        println!(
-            "{} {}",
-            start_fmt.if_supports_color(Stdout, |t| t.green()),
-            e.summary
-                .unwrap()
-                .if_supports_color(Stdout, |t| t.magenta())
-        );
+        Some(e) => {
+            let local_tz = Some(Bucharest).ok_or(HcsError::MissingStart {})?;
+            let start = chrono_tz::UTC
+                .timestamp_opt(
+                    e.start
+                        .ok_or(HcsError::MissingStart {})?
+                        .to_unix_timestamp_ms()
+                        / 1000,
+                    0,
+                )
+                .single()
+                .ok_or(HcsError::MissingStart {})?
+                .with_timezone(&local_tz);
+            let start_fmt = start.format("%H:%M").to_string();
+            if xmobar {
+                let mut out = e.summary.unwrap();
+                let len = out.len();
+                out.truncate(16);
+                if len > out.len() {
+                    out = out + "...";
+                }
+                println!("<fc=#00ed8a>{}</fc> <fc=#00d9ed>{}</fc>", start_fmt, out);
+            } else {
+                println!(
+                    "{} {}",
+                    start_fmt.if_supports_color(Stdout, |t| t.green()),
+                    e.summary
+                        .unwrap()
+                        .if_supports_color(Stdout, |t| t.magenta())
+                );
+            }
+        }
     }
     Ok(())
 }
