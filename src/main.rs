@@ -84,7 +84,10 @@ fn print_next_event(
             if xmobar {
                 println!("<fc=#00ed8a>N/A</fc>");
             } else {
-                println!("{}", "No events today.".if_supports_color(Stdout, |t| t.green()));
+                println!(
+                    "{}",
+                    "No events today.".if_supports_color(Stdout, |t| t.green())
+                );
             }
         }
         Some(e) => {
