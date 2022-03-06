@@ -3,7 +3,7 @@ mod cal;
 mod common;
 mod insert;
 mod next;
-mod today;
+mod day;
 
 use args::{Args, Commands};
 use chrono::TimeZone;
@@ -12,7 +12,7 @@ use clap::Parser;
 use next::perform_next_event_query;
 use owo_colors::{OwoColorize, Stream::Stdout};
 use std::error::Error;
-use today::perform_today_event_query;
+use day::perform_day_event_query;
 
 use crate::common::HcsError;
 
@@ -49,7 +49,7 @@ fn find_import(
         .ok_or(common::HcsError::ImportMissingKey {}.into())
 }
 
-fn print_event(e: today::today_event_query::TodayEventQueryEvents) -> Result<(), Box<dyn Error>> {
+fn print_event(e: day::today_event_query::TodayEventQueryEvents) -> Result<(), Box<dyn Error>> {
     // TODO: figure out why local_offset doesn't work
     let local_tz = Some(Bucharest).ok_or(HcsError::MissingStart {})?;
     let start = chrono_tz::UTC
@@ -126,14 +126,33 @@ fn print_next_event(
     Ok(())
 }
 
-async fn today(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
-    let result = perform_today_event_query(hasura).await?;
+async fn day(
+    hasura: common::Hasura,
+    day: chrono::DateTime<chrono::Local>,
+) -> Result<(), Box<dyn Error>> {
+    let result = perform_day_event_query(hasura, day).await?;
     result
         .into_iter()
         .map(print_event)
         .collect::<Result<Vec<()>, _>>()?;
 
     Ok(())
+}
+
+async fn today(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
+    let today = chrono::Local::today()
+        .and_hms_opt(0, 0, 0)
+        .ok_or(HcsError::TodayError {})?;
+    day(hasura, today).await
+}
+
+async fn tomorrow(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
+    let tomorrow = chrono::Local::today()
+        .and_hms_opt(0, 0, 0)
+        .ok_or(HcsError::TomorrowError {})?
+        .checked_add_signed(chrono::Duration::days(1))
+        .ok_or(HcsError::TomorrowError {})?;
+    day(hasura, tomorrow).await
 }
 
 async fn next(hasura: common::Hasura, xmobar: bool) -> Result<(), Box<dyn Error>> {
@@ -156,6 +175,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     match Args::parse().command {
         Commands::Import { target } => import(config, target).await?,
         Commands::Today {} => today(config.hasura).await?,
+        Commands::Tomorrow {} => tomorrow(config.hasura).await?,
         Commands::Next { xmobar } => next(config.hasura, xmobar).await?,
     };
 

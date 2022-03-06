@@ -15,12 +15,10 @@ use crate::common::timestamptz;
 )]
 pub struct TodayEventQuery;
 
-pub async fn perform_today_event_query(
+pub async fn perform_day_event_query(
     hasura: crate::common::Hasura,
+    today: chrono::DateTime<chrono::Local>,
 ) -> Result<Vec<today_event_query::TodayEventQueryEvents>, Box<dyn Error>> {
-    let today = chrono::Local::today()
-        .and_hms_opt(0, 0, 0)
-        .ok_or(HcsError::TodayError {})?;
     let tomorrow = today
         .checked_add_signed(chrono::Duration::days(1))
         .ok_or(HcsError::TodayError {})?;
