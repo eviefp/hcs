@@ -17,13 +17,11 @@ pub struct TodayEventQuery;
 
 pub async fn perform_day_event_query(
     hasura: crate::common::Hasura,
-    today: chrono::DateTime<chrono::Local>,
+    start_time: chrono::DateTime<chrono::Local>,
+    end_time: chrono::DateTime<chrono::Local>,
 ) -> Result<Vec<today_event_query::TodayEventQueryEvents>, Box<dyn Error>> {
-    let tomorrow = today
-        .checked_add_signed(chrono::Duration::days(1))
-        .ok_or(HcsError::TodayError {})?;
-    let start: Timestamp = Timestamp::from_unix_timestamp(today.timestamp());
-    let end: Timestamp = Timestamp::from_unix_timestamp(tomorrow.timestamp());
+    let start: Timestamp = Timestamp::from_unix_timestamp(start_time.timestamp());
+    let end: Timestamp = Timestamp::from_unix_timestamp(end_time.timestamp());
     let no_vars = today_event_query::Variables {
         start: Some(start),
         end: Some(end),

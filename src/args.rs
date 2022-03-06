@@ -17,4 +17,5 @@ pub enum Commands {
         #[clap(long)]
         xmobar: bool,
     },
+    Week {},
 }

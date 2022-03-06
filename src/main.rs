@@ -1,18 +1,18 @@
 mod args;
 mod cal;
 mod common;
+mod day;
 mod insert;
 mod next;
-mod day;
 
 use args::{Args, Commands};
 use chrono::TimeZone;
 use chrono_tz::Europe::Bucharest;
 use clap::Parser;
+use day::perform_day_event_query;
 use next::perform_next_event_query;
 use owo_colors::{OwoColorize, Stream::Stdout};
 use std::error::Error;
-use day::perform_day_event_query;
 
 use crate::common::HcsError;
 
@@ -64,6 +64,31 @@ fn print_event(e: day::today_event_query::TodayEventQueryEvents) -> Result<(), B
         .ok_or(HcsError::MissingStart {})?
         .with_timezone(&local_tz);
     let start_fmt = start.format("%H:%M").to_string();
+    println!(
+        "{} {}",
+        start_fmt.if_supports_color(Stdout, |t| t.green()),
+        e.summary
+            .unwrap()
+            .if_supports_color(Stdout, |t| t.magenta())
+    );
+    Ok(())
+}
+
+fn print_event_v(e: day::today_event_query::TodayEventQueryEvents) -> Result<(), Box<dyn Error>> {
+    // TODO: figure out why local_offset doesn't work
+    let local_tz = Some(Bucharest).ok_or(HcsError::MissingStart {})?;
+    let start = chrono_tz::UTC
+        .timestamp_opt(
+            e.start
+                .ok_or(HcsError::MissingStart {})?
+                .to_unix_timestamp_ms()
+                / 1000,
+            0,
+        )
+        .single()
+        .ok_or(HcsError::MissingStart {})?
+        .with_timezone(&local_tz);
+    let start_fmt = start.format("%b %a %d %H:%M").to_string();
     println!(
         "{} {}",
         start_fmt.if_supports_color(Stdout, |t| t.green()),
@@ -130,7 +155,10 @@ async fn day(
     hasura: common::Hasura,
     day: chrono::DateTime<chrono::Local>,
 ) -> Result<(), Box<dyn Error>> {
-    let result = perform_day_event_query(hasura, day).await?;
+    let next = day
+        .checked_add_signed(chrono::Duration::days(1))
+        .ok_or(HcsError::TodayError {})?;
+    let result = perform_day_event_query(hasura, day, next).await?;
     result
         .into_iter()
         .map(print_event)
@@ -155,6 +183,22 @@ async fn tomorrow(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
     day(hasura, tomorrow).await
 }
 
+async fn week(hasura: common::Hasura) -> Result<(), Box<dyn Error>> {
+    let today = chrono::Local::today()
+        .and_hms_opt(0, 0, 0)
+        .ok_or(HcsError::TodayError {})?;
+    let next = today
+        .checked_add_signed(chrono::Duration::days(7))
+        .ok_or(HcsError::TodayError {})?;
+    let result = perform_day_event_query(hasura, today, next).await?;
+    result
+        .into_iter()
+        .map(print_event_v)
+        .collect::<Result<Vec<()>, _>>()?;
+
+    Ok(())
+}
+
 async fn next(hasura: common::Hasura, xmobar: bool) -> Result<(), Box<dyn Error>> {
     let result = perform_next_event_query(hasura).await?;
     print_next_event(result, xmobar)?;
@@ -177,6 +221,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Commands::Today {} => today(config.hasura).await?,
         Commands::Tomorrow {} => tomorrow(config.hasura).await?,
         Commands::Next { xmobar } => next(config.hasura, xmobar).await?,
+        Commands::Week {} => week(config.hasura).await?,
     };
 
     Ok(())
